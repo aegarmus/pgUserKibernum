@@ -1,4 +1,4 @@
-
+import { ValidatorError } from "../utils/errors.util.js";
 
 export class User {
     #id;
@@ -27,11 +27,11 @@ export class User {
         updatedAt = null
     }) {
         if(!name || !lastname || !email) {
-            throw new Error('name, lastname y/o mail son obligatorios')
+            throw new ValidatorError('name, lastname y/o mail son obligatorios')
         }
 
         if(Number(budget) < 0) {
-            throw new Error('El budget no puede ser negativo')
+            throw new ValidatorError('El budget no puede ser negativo')
         }
 
         this.#id = id;
@@ -68,7 +68,7 @@ export class User {
         if(fields.birthdate !== undefined) this.#birthdate = fields.birthdate
         if(fields.budget !== undefined) {
             if(Number(fields.budget) < 0) {
-                throw new Error('Budget debe ser superior a 0')
+                throw new ValidatorError('Budget debe ser superior a 0')
             }
 
             this.#budget = Number(fields.budget)

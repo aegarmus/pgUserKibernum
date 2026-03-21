@@ -1,5 +1,6 @@
 import { User } from "../../model/User.model.js";
 import { UserRepository } from "../../repository/User.repositroy.js";
+import { UserError } from "../../utils/errors.util.js";
 import { Logger } from "../../utils/Logger.js";
 
 
@@ -28,7 +29,7 @@ export class UserService {
             return user.toObject()
         } catch (error) {
             this.logger.error('Error al registrar usuario', error)
-            throw new Error('Error al registrar el usuario')
+            throw new UserError('Error al registrar el usuario', error.message)
         }
     }
 
@@ -43,7 +44,7 @@ export class UserService {
             return usersObject
         } catch (error) {
             this.logger.error("Error al encontrar los usuarios", error);
-            throw new Error("Error al encontrar los usuarios");
+            throw new UserError("Error al encontrar los usuarios", error.message);
         }
     }
 
@@ -58,7 +59,7 @@ export class UserService {
             return usersObject;
         } catch (error) {
             this.logger.error("Error al encontrar los usuarios", error);
-            throw new Error("Error al encontrar los usuarios");
+            throw new UserError("Error al encontrar los usuarios", error.message);
         }
     }
 }

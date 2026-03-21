@@ -12,11 +12,7 @@ export class UserController {
                 data
             })
         } catch (error) {
-            res.status(500).json({
-                message: 'Error al crear el usuario',
-                statusCode: 500,
-                error
-            })
+            next()
         }
     }
 
@@ -29,11 +25,7 @@ export class UserController {
                 data
             })
         } catch (error) {
-            res.status(500).json({
-                message: 'Error al encontrar los usuarios',
-                statusCode: 404,
-                error
-            })
+            next()
         }
     }
 
@@ -46,11 +38,7 @@ export class UserController {
                 data
             })
         } catch (error) {
-            res.status(500).json({
-                message: 'Error al encontrar los usuarios',
-                statusCode: 404,
-                error
-            })
+            next()
         }
     }
 }

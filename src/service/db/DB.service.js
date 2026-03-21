@@ -1,4 +1,5 @@
 import { query } from "../../config/db.config.js";
+import { DBError } from "../../utils/errors.util.js";
 import { Logger } from "../../utils/Logger.js";
 import { userTable } from "./tables/User.table.js";
 
@@ -12,7 +13,7 @@ export class DB {
             this.logger.info('Base de datos conectada con éxito! 👾')
         } catch (error) {
             this.logger.error(`Error al conectarse con la base de datos`, error);
-            throw new Error(`No pudimos conectarnos a la base de datos`)
+            throw new DBError(`No pudimos conectarnos a la base de datos`, error)
         }
     }
 
@@ -24,7 +25,7 @@ export class DB {
             this.logger.info('Tablas inicializadas con éxito')
         } catch (error) {
             console.error(`Error al inicializar la DB: ${JSON.stringify(error)}`)
-            throw new Error('Error al inicializar la DB')
+            throw new DBError('Error al inicializar la DB', error)
         }
     }
 }

@@ -1,5 +1,6 @@
 import { query } from "../config/db.config.js"
 import { User } from "../model/User.model.js"
+import { UserError } from "../utils/errors.util.js"
 import { Logger } from "../utils/Logger.js"
 
 
@@ -24,7 +25,7 @@ export class UserRepository {
             })
         } catch (error) {
             this.logger.error(`Error al formatear filas a entidad User: ${error.message}`)
-            throw new Error('Error al realizar la conversión de filas a entidad User')
+            throw new UserError('Error al realizar la conversión de filas a entidad User', error.message)
         }
     }
 
@@ -57,7 +58,7 @@ export class UserRepository {
             return this.mapRowToEntity(rows[0])
         } catch (error) {
             this.logger.error(`Error al insertar los datos en la DB: ${error.message}`)
-            throw new Error('Error al insertar datos de usuario')
+            throw new UserError('Error al insertar datos de usuario', error.message)
         }
     }
 
@@ -80,7 +81,7 @@ export class UserRepository {
             return rows.map(row => this.mapRowToEntity(row))
         } catch (error) {
             this.logger.error('Error al encontrar todos los usuarios')
-            throw new Error("Error al encontrar todos los usuarios");
+            throw new UserError("Error al encontrar todos los usuarios", error.message);
         }
     }
 }
