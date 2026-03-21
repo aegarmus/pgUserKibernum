@@ -159,8 +159,6 @@ export class UserRepository {
             const { rows } = await query(sql, values)
             this.logger.info('Registro permanenete eliminado con éxito!')
 
-            this.logger.debug('entidad rows', rows)
-
             this.logger.debug("Inicializando mapeo de filas a entidad modelo User");
             return this.mapRowToEntity(rows[0]);
             
@@ -168,7 +166,61 @@ export class UserRepository {
             this.logger.error("Error al eliminar el usuario");
             throw new UserError("Error al eliminar el usuario", error.message);
         }
+    }
 
+    static async softDelete(id) {
+        try {
+            const sql = `
+                UPDATE users
+                SET
+                    active = false,
+                    deleted_at = NOW(),
+                    updated_at = NOW()
+                WHERE id = $1
+                    AND active = true
+                    AND deleted_at IS NULL
+                RETURNING *;
+            `
 
+            const values = [ id ]
+
+            this.logger.info('Inicializando consulta de eliminación lógica')
+            const { rows } = await query(sql, values)
+            this.logger.info('Registro eliminado lógicamente con éxito')
+
+            this.logger.debug("Inicializando mapeo de filas a entidad modelo User");
+            return this.mapRowToEntity(rows[0]);
+        } catch (error) {
+            this.logger.error("Error al eliminar el usuario");
+            throw new UserError("Error al eliminar el usuario", error.message);
+        }
+    }
+
+    static async restore(id) {
+        try {
+            const sql = `
+                UPDATE users
+                SET
+                    active = true,
+                    deleted_at = NULL,
+                    updated_at = NOW()
+                WHERE id = $1
+                    AND active = false
+                    AND deleted_at IS NOT NULL
+                RETURNING *;
+            `
+
+            const values = [ id ]
+
+            this.logger.info('Inicializando consulta de restuaración de datos')
+            const { rows } = await query(sql, values)
+            this.logger.info('Registro restaurado con éxito')
+
+            this.logger.debug("Inicializando mapeo de filas a entidad modelo User");
+            return this.mapRowToEntity(rows[0]);
+        } catch (error) {
+            this.logger.error("Error al restaurar el usuario");
+            throw new UserError("Error al restaurar el usuario", error.message);
+        }
     }
 }

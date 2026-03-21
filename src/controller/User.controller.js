@@ -93,4 +93,30 @@ export class UserController {
             next(error)
         }
     }
+
+    static async softDelete(req, res, next) {
+        try {
+            const data = await UserService.softDelete(req.params.id)
+            res.status(200).json({
+                message: 'Usuario eliminado con éxito',
+                statusCode: 200,
+                data
+            })
+        } catch (error) {
+            next(error)
+        }
+    }
+
+    static async restore(req, res, next) {
+        try {
+            const data = await UserService.restore(req.params.id)
+            res.status(200).json({
+                message: 'Usuario restaurado con éxito',
+                statusCode: 200,
+                data
+            })
+        } catch (error) {
+            next(error)
+        }
+    }
 }

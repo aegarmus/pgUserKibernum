@@ -134,4 +134,40 @@ export class UserService {
             throw new UserError(`Error al eliminar el usuario con id ${id}`, error.message);
         }
     }
+
+    static async softDelete(id) {
+        try {
+            this.logger.debug('Comprobando usuario para eliminar')
+            const user = await UserRepository.findById(id);
+
+            if(!user) throw new UserError('Usuario no encontrado', `No encontramos al usuario con el id: ${id}`, 404) 
+
+            this.logger.info('Inicializando Eliminación')
+            const deletedUser = await UserRepository.softDelete(id);
+            this.logger.info('Usuario eliminado logicamente con exito')
+
+            return deletedUser.toObject()
+        } catch (error) {
+            this.logger.error(`Error al eliminar el usuario con id ${id}`, error);
+            throw new UserError(`Error al eliminar el usuario con id ${id}`, error.message);
+        }
+    }
+
+    static async restore(id) {
+        try {
+            this.logger.debug('Comprobando usuario para restaurar')
+            const user = await UserRepository.findById(id, { includeDeleted: true });
+
+            if(!user) throw new UserError('Usuario no encontrado', `No encontramos al usuario con el id: ${id}`, 404) 
+
+            this.logger.info('Inicializando restauración')
+            const deletedUser = await UserRepository.restore(id);
+            this.logger.info('Usuario restaurado con exito')
+
+            return deletedUser.toObject()
+        } catch (error) {
+            this.logger.error(`Error al restaurar el usuario con id ${id}`, error);
+            throw new UserError(`Error al restaurar el usuario con id ${id}`, error.message);
+        }
+    }
 }
