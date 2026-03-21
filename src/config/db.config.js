@@ -1,7 +1,8 @@
 import pkg from 'pg'
 import { env } from './env.config.js'
-const { Pool } = pkg
 
+
+const { Pool } = pkg
 const { db } = env
 
 const pool = new Pool({

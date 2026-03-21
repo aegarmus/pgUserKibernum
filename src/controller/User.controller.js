@@ -19,4 +19,38 @@ export class UserController {
             })
         }
     }
+
+    static async findAll(req, res) {
+        try {
+            const data = await UserService.findAll()
+            res.status(200).json({
+                message: 'Usuarios encontrados con éxito',
+                statusCode: 200,
+                data
+            })
+        } catch (error) {
+            res.status(500).json({
+                message: 'Error al encontrar los usuarios',
+                statusCode: 404,
+                error
+            })
+        }
+    }
+
+    static async findAllwithDeleted(req, res) {
+        try {
+            const data = await UserService.findAllWithDeleted()
+            res.status(200).json({
+                message: 'Usuarios encontrados con éxito',
+                statusCode: 200,
+                data
+            })
+        } catch (error) {
+            res.status(500).json({
+                message: 'Error al encontrar los usuarios',
+                statusCode: 404,
+                error
+            })
+        }
+    }
 }

@@ -8,20 +8,24 @@ export class UserRepository {
 
     static mapRowToEntity(row) {
         if(!row) return null
-
-        return new User({
-            id: row.id,
-            name: row.name,
-            lastname: row.lastname,
-            email: row.email,
-            phone: row.phone,
-            birthdate: row.birthdate,
-            budget: row.budget,
-            active: row.active,
-            deletedAt: row.deleted_at,
-            createdAt: row.created_at,
-            updatedAt: row.updated_at
-        })
+        try {
+            return new User({
+                id: row.id,
+                name: row.name,
+                lastname: row.lastname,
+                email: row.email,
+                phone: row.phone,
+                birthdate: row.birthdate,
+                budget: row.budget,
+                active: row.active,
+                deletedAt: row.deleted_at,
+                createdAt: row.created_at,
+                updatedAt: row.updated_at
+            })
+        } catch (error) {
+            this.logger.error(`Error al formatear filas a entidad User: ${error.message}`)
+            throw new Error('Error al realizar la conversión de filas a entidad User')
+        }
     }
 
     static async create(user) {
@@ -54,6 +58,29 @@ export class UserRepository {
         } catch (error) {
             this.logger.error(`Error al insertar los datos en la DB: ${error.message}`)
             throw new Error('Error al insertar datos de usuario')
+        }
+    }
+
+    static async findAll({ includeDeleted = false } = {}) {
+        try {
+            const sqlBase = `
+                SELECT 
+                    id, name, lastname, email, phone, birthdate, budget, active, created_at, updated_at, deleted_at
+                FROM users`
+
+            const sql = includeDeleted
+                ? `${sqlBase} ORDER BY created_at DESC`
+                : `${sqlBase} WHERE active = true AND deleted_at IS NULL ORDER BY created_at DESC`
+            
+            this.logger.info('Inicializando consulta para obtener datos')
+            const { rows } = await query(sql)
+            this.logger.info('Datos recuperados con éxito')
+    
+            this.logger.debug('Inicializando mapeo de filas a entidad modelo User')
+            return rows.map(row => this.mapRowToEntity(row))
+        } catch (error) {
+            this.logger.error('Error al encontrar todos los usuarios')
+            throw new Error("Error al encontrar todos los usuarios");
         }
     }
 }
