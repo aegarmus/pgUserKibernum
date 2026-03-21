@@ -9,5 +9,6 @@ router.get('/users/admin', UserController.findAllwithDeleted)
 router.get('/users/:id', UserController.findById)
 router.get('/users/admin/:id', UserController.findByIdWithDeleted)
 router.put('/users/:id',  UserController.update)
+router.delete('/users/admin/:id', UserController.permaDelete)
 
 export default router

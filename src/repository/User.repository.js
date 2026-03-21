@@ -149,4 +149,26 @@ export class UserRepository {
             throw new UserError("Error al actualizar el usuario", error.message);
         }
     }
+
+    static async permaDelete(id) {
+        try {
+            const sql = `DELETE FROM users WHERE id = $1 RETURNING *;`
+            const values = [ id ]
+
+            this.logger.info('Inicializando consulta para eliminar registro')
+            const { rows } = await query(sql, values)
+            this.logger.info('Registro permanenete eliminado con éxito!')
+
+            this.logger.debug('entidad rows', rows)
+
+            this.logger.debug("Inicializando mapeo de filas a entidad modelo User");
+            return this.mapRowToEntity(rows[0]);
+            
+        } catch (error) {
+            this.logger.error("Error al eliminar el usuario");
+            throw new UserError("Error al eliminar el usuario", error.message);
+        }
+
+
+    }
 }

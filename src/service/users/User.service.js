@@ -116,4 +116,22 @@ export class UserService {
             throw new UserError(`Error al actualizar el usuario con id ${id}`, error.message);
         }
     }
+
+    static async permaDelete(id) {
+        try {
+            this.logger.debug("Comprobando usuario para actualizar");
+            const user = await UserRepository.findById(id);
+
+            if (!user) throw new UserError("Usuario no encontrado", `No encontramos al usuario con id: ${id}`, 404);
+
+            this.logger.info('Inicializando eliminación')
+            const deletedUser = await UserRepository.permaDelete(id)
+            this.logger.info('Usuario eliminado con éxito')
+
+            return deletedUser.toObject()
+        } catch (error) {
+            this.logger.error(`Error al eliminar el usuario con id ${id}`, error);
+            throw new UserError(`Error al eliminar el usuario con id ${id}`, error.message);
+        }
+    }
 }

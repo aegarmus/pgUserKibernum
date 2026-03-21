@@ -12,7 +12,7 @@ export class UserController {
                 data
             })
         } catch (error) {
-            next()
+            next(error)
         }
     }
 
@@ -25,7 +25,7 @@ export class UserController {
                 data
             })
         } catch (error) {
-            next()
+            next(error)
         }
     }
 
@@ -38,7 +38,7 @@ export class UserController {
                 data
             })
         } catch (error) {
-            next()
+            next(error)
         }
     }
 
@@ -51,7 +51,7 @@ export class UserController {
                 data
             })
         } catch (error) {
-            next()
+            next(error)
         }
     }
 
@@ -64,7 +64,7 @@ export class UserController {
                 data
             })
         } catch (error) {
-            next()
+            next(error)
         }
     }
 
@@ -77,7 +77,20 @@ export class UserController {
                 data
             })
         } catch (error) {
-            next()
+            next(error)
+        }
+    }
+
+    static async permaDelete(req, res, next) {
+        try {
+            const data = await UserService.permaDelete(req.params.id)
+            res.status(200).json({
+                message: 'Usuario eliminado con éxito',
+                statusCode: 200,
+                data
+            })
+        } catch (error) {
+            next(error)
         }
     }
 }
