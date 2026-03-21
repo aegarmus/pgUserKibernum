@@ -2,6 +2,7 @@ import express from 'express'
 import { Logger } from "../../utils/Logger.js"
 import { DB } from "../db/DB.service.js"
 import { env } from "../../config/env.config.js"
+import userRouter from '../../routes/user.routes.js'
 
 const logger = new Logger('SERVER')
 const { app: { port, environment } } = env
@@ -21,6 +22,8 @@ export const bootstrap = async (config = {}) => {
         app.use(express.urlencoded({ extended: true }))
     }
 
+    logger.info('Inicializando rutas')
+    app.use('/api/v1', userRouter)
 
     try {
         await DB.init()
