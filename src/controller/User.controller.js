@@ -2,7 +2,7 @@ import { UserService } from "../service/users/User.service.js";
 
 
 export class UserController {
-    static async create(req, res) {
+    static async create(req, res, next) {
         try {
             const data = await UserService.create(req.body)
 
@@ -16,7 +16,7 @@ export class UserController {
         }
     }
 
-    static async findAll(req, res) {
+    static async findAll(req, res, next) {
         try {
             const data = await UserService.findAll()
             res.status(200).json({
@@ -29,7 +29,7 @@ export class UserController {
         }
     }
 
-    static async findAllwithDeleted(req, res) {
+    static async findAllwithDeleted(req, res, next) {
         try {
             const data = await UserService.findAllWithDeleted()
             res.status(200).json({
@@ -42,7 +42,7 @@ export class UserController {
         }
     }
 
-    static async findById(req, res) {
+    static async findById(req, res, next) {
         try {
             const data = await UserService.findById(req.params.id)
             res.status(200).json({
@@ -55,11 +55,24 @@ export class UserController {
         }
     }
 
-    static async findByIdWithDeleted(req, res) {
+    static async findByIdWithDeleted(req, res, next) {
         try {
             const data = await UserService.findByIdWithDeleted(req.params.id)
             res.status(200).json({
                 message: 'Usuario encontrado con éxito',
+                statusCode: 200,
+                data
+            })
+        } catch (error) {
+            next()
+        }
+    }
+
+    static async update(req, res, next) {
+        try {
+            const data = await UserService.update(req.params.id, req.body)
+            res.status(200).json({
+                message: 'Usuario actualizado con éxito',
                 statusCode: 200,
                 data
             })

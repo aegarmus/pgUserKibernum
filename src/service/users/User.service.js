@@ -70,8 +70,8 @@ export class UserService {
             this.logger.debug(`Usuarios con id ${id} encontrados con éxito`);
             return user.toObject()
         } catch (error) {
-            this.logger.error(`Error al encontrar el usuario usuario con id ${id}`, error);
-            throw new UserError(`Error al encontrar el usuario usuario con id ${id}`, error.message);
+            this.logger.error(`Error al encontrar el usuario con id ${id}`, error);
+            throw new UserError(`Error al encontrar el usuario con id ${id}`, error.message);
         }
     }
 
@@ -82,8 +82,38 @@ export class UserService {
             this.logger.debug(`Usuarios con id ${id} encontrados con éxito`);
             return user.toFullObject()
         } catch (error) {
-            this.logger.error(`Error al encontrar el usuario usuario con id ${id}`, error);
-            throw new UserError(`Error al encontrar el usuario usuario con id ${id}`, error.message);
+            this.logger.error(`Error al encontrar el usuario con id ${id}`, error);
+            throw new UserError(`Error al encontrar el usuario con id ${id}`, error.message);
+        }
+    }
+
+    static async update(id, data) {
+        try {
+            this.logger.debug('Comprobando usuario para actualizar')
+            const user = await UserRepository.findById(id)
+
+            if(!user) throw new UserError('Usuario no encontrado', `No encontramos al usuario con id: ${id}`, 404)
+            
+            this.logger.debug('Usuario encontrado con éxito')
+            this.logger.info('Inicializando actualización')
+            user.update(data)
+
+            const userUpdated = await UserRepository.update(id, {
+                name: user.name,
+                lastname: user.lastname,
+                email: user.email,
+                phone: user.phone,
+                birthdate: user.birthdate,
+                budget: user.budget
+            })
+
+            this.logger.info('Usuario actualizado con éxito')
+
+            return userUpdated.toObject()
+
+        } catch (error) {
+            this.logger.error(`Error al actualizar el usuario con id ${id}`, error);
+            throw new UserError(`Error al actualizar el usuario con id ${id}`, error.message);
         }
     }
 }

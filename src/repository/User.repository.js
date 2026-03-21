@@ -109,4 +109,44 @@ export class UserRepository {
             throw new UserError("Error al encontrar el usuario", error.message)
         }
     }
+
+    static async update(id, data) {
+        try {
+            const sql = `
+                UPDATE users
+                SET
+                    name = $1,
+                    lastname = $2,
+                    email = $3,
+                    phone = $4,
+                    birthdate = $5,
+                    budget = $6,
+                    updated_at = NOW()
+                WHERE id = $7
+                    AND active = true
+                    AND deleted_at IS NULL
+                RETURNING *;
+            `
+
+            const values = [
+                data.name,
+                data.lastname,
+                data.email,
+                data.phone,
+                data.birthdate,
+                data.budget,
+                id
+            ];
+
+            this.logger.info("Inicializando consulta para actualizar datos");
+            const { rows } = await query(sql, values);
+            this.logger.info("Datos actualizados con éxito");
+
+            this.logger.debug("Inicializando mapeo de filas a entidad modelo User");
+            return this.mapRowToEntity(rows[0])
+        } catch (error) {
+            this.logger.error("Error al actualizar el usuario");
+            throw new UserError("Error al actualizar el usuario", error.message);
+        }
+    }
 }
