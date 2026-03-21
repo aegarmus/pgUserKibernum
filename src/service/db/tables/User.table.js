@@ -1,8 +1,11 @@
 import { query } from "../../../config/db.config.js"
+import { Logger } from "../../../utils/Logger.js"
+
+const logger = new Logger('DATABASE')
 
 export const userTable = async () => {
     try {
-        console.log('Inicializando tabla usuario')
+        logger.debug('Inicializando tabla usuario')
 
         await query(`
             CREATE TABLE IF NOT EXISTS users (
@@ -20,9 +23,9 @@ export const userTable = async () => {
             );
         `)
 
-        console.log('Tabla usuario verificada')
+        logger.debug('Tabla usuario verificada')
     } catch (error) {
-        console.error(`Error al inicializar tabla user: ${JSON.stringify(error)}`)
+        logger.error(`Error al inicializar tabla user: ${JSON.stringify(error)}`)
         throw new Error('Error al inicializar la tabla users')
     }
 }

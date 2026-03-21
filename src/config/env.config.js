@@ -5,7 +5,7 @@ dotenv.config()
 export const env = {
     app: {
         port: process.env.PORT,
-        env: process.env.ENVIRONMENT
+        environment: process.env.ENVIRONMENT
     },
     db: {
         host: process.env.DB_HOST,
