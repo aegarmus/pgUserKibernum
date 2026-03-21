@@ -1,5 +1,5 @@
 import { User } from "../../model/User.model.js";
-import { UserRepository } from "../../repository/User.repositroy.js";
+import { UserRepository } from "../../repository/User.repository.js";
 import { UserError } from "../../utils/errors.util.js";
 import { Logger } from "../../utils/Logger.js";
 
@@ -60,6 +60,30 @@ export class UserService {
         } catch (error) {
             this.logger.error("Error al encontrar los usuarios", error);
             throw new UserError("Error al encontrar los usuarios", error.message);
+        }
+    }
+
+    static async findById(id) {
+        try {
+            this.logger.info(`Inicializando busqueda de usuarios con id: ${id}`);
+            const user = await UserRepository.findById(id)
+            this.logger.debug(`Usuarios con id ${id} encontrados con éxito`);
+            return user.toObject()
+        } catch (error) {
+            this.logger.error(`Error al encontrar el usuario usuario con id ${id}`, error);
+            throw new UserError(`Error al encontrar el usuario usuario con id ${id}`, error.message);
+        }
+    }
+
+    static async findByIdWithDeleted(id) {
+        try {
+            this.logger.info(`Inicializando busqueda de usuarios con id: ${id}`);
+            const user = await UserRepository.findById(id, { includeDeleted: true })
+            this.logger.debug(`Usuarios con id ${id} encontrados con éxito`);
+            return user.toFullObject()
+        } catch (error) {
+            this.logger.error(`Error al encontrar el usuario usuario con id ${id}`, error);
+            throw new UserError(`Error al encontrar el usuario usuario con id ${id}`, error.message);
         }
     }
 }

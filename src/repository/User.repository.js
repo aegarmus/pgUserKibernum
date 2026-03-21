@@ -84,4 +84,29 @@ export class UserRepository {
             throw new UserError("Error al encontrar todos los usuarios", error.message);
         }
     }
+
+    static async findById(id, { includeDeleted = false } = {}) {
+        try {
+            const sqlBase = `
+                SELECT 
+                    id, name, lastname, email, phone, birthdate, budget, active, created_at, updated_at, deleted_at
+                FROM users`;
+            
+            const sql = includeDeleted
+                ? `${sqlBase} WHERE id = $1 LIMIT 1`
+                : `${sqlBase} WHERE id = $1 AND active = true AND deleted_at IS NULL LIMIT 1`
+            
+            const value = [ id ]
+
+            this.logger.info("Inicializando consulta para obtener datos");
+            const { rows } = await query(sql, value);
+            this.logger.info("Datos recuperados con éxito");
+
+            this.logger.debug("Inicializando mapeo de filas a entidad modelo User");
+            return this.mapRowToEntity(rows[0])
+        } catch (error) {
+            this.logger.error('Error al encontrar el usuario')
+            throw new UserError("Error al encontrar el usuario", error.message)
+        }
+    }
 }

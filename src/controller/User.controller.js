@@ -41,4 +41,30 @@ export class UserController {
             next()
         }
     }
+
+    static async findById(req, res) {
+        try {
+            const data = await UserService.findById(req.params.id)
+            res.status(200).json({
+                message: 'Usuario encontrado con éxito',
+                statusCode: 200,
+                data
+            })
+        } catch (error) {
+            next()
+        }
+    }
+
+    static async findByIdWithDeleted(req, res) {
+        try {
+            const data = await UserService.findByIdWithDeleted(req.params.id)
+            res.status(200).json({
+                message: 'Usuario encontrado con éxito',
+                statusCode: 200,
+                data
+            })
+        } catch (error) {
+            next()
+        }
+    }
 }
