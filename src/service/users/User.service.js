@@ -11,7 +11,7 @@ export class UserService {
         try {
             this.logger.debug('Inicializando instancia del modelo', data)
             const userData = new User({
-                name: data.name,
+                name: data.name, 
                 lastname: data.lastname,
                 email: data.email,
                 phone: data.phone,

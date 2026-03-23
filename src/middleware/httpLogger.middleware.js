@@ -25,4 +25,4 @@ export const httpLogger = (req, res, next) => {
     })
 
     next()
-}
+} 

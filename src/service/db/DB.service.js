@@ -1,7 +1,8 @@
 import { query } from "../../config/db.config.js";
 import { DBError } from "../../utils/errors.util.js";
 import { Logger } from "../../utils/Logger.js";
-import { userTable } from "./tables/User.table.js";
+import { initializerTables } from "./tables/init.tables.js";
+
 
 export class DB {
     static logger = new Logger('DATABASE')
@@ -20,9 +21,7 @@ export class DB {
     static async init() {
         try {
             await this.checkDBConnection()
-            this.logger.info('Inicializando tablas')
-            await userTable()
-            this.logger.info('Tablas inicializadas con éxito')
+            await initializerTables()
         } catch (error) {
             console.error(`Error al inicializar la DB: ${JSON.stringify(error)}`)
             throw new DBError('Error al inicializar la DB', error)
