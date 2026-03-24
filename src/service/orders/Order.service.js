@@ -1,22 +1,20 @@
-import { Order } from "../../model/Order.model.js";
+import { Order } from "../../model/Oder.model.js";
 import { OrderRepository } from "../../repository/Order.repository.js";
 import { OrderError } from "../../utils/errors.util.js";
 import { Logger } from "../../utils/Logger.js";
 
 
 export class OrderService {
-    static logger = new Logger('Order_SERVICE')
+    static logger = new Logger('ORDER_SERVICE')
 
     static async create(data) {
         try {
             this.logger.debug('Inicializando instancia del modelo', data)
             const orderData = new Order({
-                name: data.name, 
-                lastname: data.lastname,
-                email: data.email,
-                phone: data.phone,
-                birthdate: data.birthdate,
-                budget: data.budget
+                userId: data.userId,
+                title: data.title,
+                description: data.description,
+                amount: data.amount,
             })
 
             this.logger.debug('Data instanciada con éxito', orderData.toFullObject())
@@ -45,6 +43,19 @@ export class OrderService {
         } catch (error) {
             this.logger.error("Error al encontrar los ordeness", error);
             throw new OrderError("Error al encontrar los ordeness", error.message);
+        }
+    }
+
+    static async findAllWithUser() {
+        try {
+            this.logger.info("Inicializando busqueda de ordenes con usuarios");
+            const order = await OrderRepository.findAllWithUser();
+            this.logger.debug("ordenes con usuarios encontrados con éxito");
+
+            return order
+        } catch (error) {
+            this.logger.error('Error al encontrar ordenes con usuarios', error)
+            throw new OrderError('Error al encontrar las ordenes con usuarios', error.message)
         }
     }
 

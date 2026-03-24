@@ -26,6 +26,12 @@ export class UserError extends AppError {
     }
 }
 
+export class OrderError extends AppError {
+    constructor(message, details, statusCode) {
+        super(message || 'Error al procesar la entidad Order', statusCode || 500, details)
+    }
+}
+
 export class DBError extends AppError {
     constructor(message, details, statusCode) {
         super(message || 'Error al comunicarnos con la base de datos', statusCode || 500, details)

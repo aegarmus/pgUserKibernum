@@ -2,7 +2,7 @@ import express from 'express'
 import { Logger } from "../../utils/Logger.js"
 import { DB } from "../db/DB.service.js"
 import { env } from "../../config/env.config.js"
-import userRouter from '../../routes/user.routes.js'
+import appRouter from '../../routes/index.routes.js'
 import { httpLogger } from '../../middleware/httpLogger.middleware.js'
 import { errorHandler } from '../../middleware/error.middleware.js'
 
@@ -29,7 +29,7 @@ export const bootstrap = async (config = {}) => {
     }
 
     logger.info('Inicializando rutas')
-    app.use('/api/v1', userRouter)
+    app.use('/api/v1', appRouter)
 
     logger.info('Inicializando manejo de errores')
     app.use(errorHandler)
