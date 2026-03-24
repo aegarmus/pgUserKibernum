@@ -4,6 +4,7 @@ import { OrderController } from '../controller/Order.controller.js'
 const router = Router()
 
 router.post('/', OrderController.create)
+router.post('/user', OrderController.createOrderAndChargeUser)
 router.get('/', OrderController.findAll)
 router.get('/user', OrderController.findAllWithUser)
 router.get('/admin', OrderController.findAllwithDeleted)

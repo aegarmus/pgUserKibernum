@@ -1,8 +1,9 @@
 import { query } from "../config/db.config.js";
 import { Order } from "../model/Oder.model.js";
 import { User } from "../model/User.model.js";
-import { OrderError } from "../utils/errors.util.js";
+import { OrderError, ValidatorError } from "../utils/errors.util.js";
 import { Logger } from "../utils/Logger.js";
+import { UserRepository } from "./User.repository.js";
 
 
 export class OrderRepository {
@@ -157,5 +158,102 @@ export class OrderRepository {
         }
     }
 
-    
+    static async createOrderAndChargeUser(orderData) {
+        try {
+            this.logger.info('Iniciando transacción: Crear orden y cargar al usuario')
+            await query('BEGIN')
+
+            // 1 -> Verificar que el usuario tiene fondos y que esten listos para actualizar
+            const userCheckSql = `
+                SELECT
+                    id, name, lastname, email, phone, birthdate, budget, active, created_at, updated_at, deleted_at
+                FROM users 
+                WHERE id = $1 AND active = true AND deleted_at IS NULL
+                FOR UPDATE
+            `;
+
+            this.logger.info('Inicializando consulta de verificación de usuario')
+            const userResult = await query(userCheckSql, [ orderData.userId ])
+
+            const user = userResult.rows[0]
+            const currentBudget = user.budget
+            const orderAmount = orderData.amount
+
+            if(currentBudget < orderAmount) {
+                throw new ValidatorError(`Fondos insuficientes: 
+                    Fondo actual: ${currentBudget}
+                    Monto Requerido: ${orderAmount}    
+                `)
+            }
+
+            this.logger.debug('Usuario verificado con fondos suficientes')
+
+            // 2 -> Crear la Orden de compra
+
+            const inserOrderSql = `
+                INSERT INTO orders (
+                    id, user_id, title, description, amount, status, order_date, active, deleted_at
+                ) VALUES($1, $2, $3, $4, $5, $6, $7, $8, $9)
+                RETURNING *;
+            `
+
+            const orderValues = [
+                orderData.id,
+                orderData.userId,
+                orderData.title,
+                orderData.description,
+                orderData.amount,
+                'completed',
+                orderData.orderDate,
+                orderData.active,
+                orderData.deletedAt,
+            ];
+
+            this.logger.info('Inicializando creación de recibo')
+            const orderResult = await query(inserOrderSql, orderValues)
+            this.logger.debug('Orden creada con éxito')
+
+            // 3 -> Actualizar fondos del usuario
+            const newBudget = currentBudget - orderAmount;
+            const updateUserSql = `
+                UPDATE users
+                SET budget = $1, updated_at = NOW()
+                WHERE id = $2
+                RETURNING *;
+            `
+
+            const updateValues = [ newBudget, orderData.userId ]
+
+            this.logger.info('Inicializando actualización de fondos del usuario')
+            const userUpdatedResult = await query(updateUserSql, updateValues)
+            this.logger.debug('Fondos de usuario actualizados')
+
+            //4 -> Confirmar transacción
+            await query('COMMIT')
+            this.logger.info('Transacción completada con éxito')
+
+            // 5 -> Mapear resultados
+            this.logger.info('Mapeando información del recibo y usuario')
+            const createdOrder = this.mapRowToEntity(orderResult.rows[0])
+            const updatedUser = UserRepository.mapRowToEntity(userUpdatedResult.rows[0])
+            this.logger.info('Mapeo de datos realizado con éxito')
+
+            return {
+                order: createdOrder.toObject(),
+                user: updatedUser.toObject(),
+                transactionSummary: {
+                    previousBudget: currentBudget,
+                    chargedAmount: orderAmount,
+                    newBudget
+                }
+            }
+        } catch (error) {
+            this.logger.warn('Error detectado iniciando Rollback')
+            await query('ROLLBACK')
+            this.logger.warn('Transacción revertida!')
+
+            this.logger.error('Error al crear una orden y la carga al usuario')
+            throw new OrderError('Error al procesar la orden con cargo', error.message)
+        }
+    }
 }   

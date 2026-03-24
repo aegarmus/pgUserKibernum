@@ -31,6 +31,32 @@ export class OrderService {
         }
     }
 
+    static async createOrderAndChargeUser(data) {
+        try {
+            this.logger.info('Iniciando Servicio de creación de recibo y cargo al usuario')
+
+            this.logger.debug('Inicializamos modelo de ingreso de datos')
+
+            const orderData = new Order({
+                userId: data.userId,
+                title: data.title,
+                description: data.description,
+                amount: data.amount,
+            });
+
+            this.logger.debug('Data instanciada con éxito', orderData.toFullObject())
+
+            this.logger.info("Creando registro en la base de datos");
+            const result = await OrderRepository.createOrderAndChargeUser(orderData)
+            this.logger.info('Transacción completada exitosamente desde el servicio')
+
+            return result
+        } catch (error) {
+            this.logger.error('Error al registrar ordenes', error)
+            throw new OrderError('Error al registrar el ordenes', error.message)
+        }
+    }
+
     static async findAll() {
         try {
             this.logger.info('Inicializando busqueda de ordeness')

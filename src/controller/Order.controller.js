@@ -16,6 +16,20 @@ export class OrderController {
         }
     }
 
+    static async createOrderAndChargeUser(req, res, next) {
+        try {
+            const data = await OrderService.createOrderAndChargeUser(req.body)
+
+            res.status(201).json({
+                message: 'Recibo creado con éxito con carga a los fondos del usuario',
+                statusCode: 201,
+                data
+            })
+        } catch (error) {
+            next(error)
+        }
+    }
+
     static async findAll(req, res, next) {
         try {
             const data = await OrderService.findAll()
